@@ -1,4 +1,5 @@
 import os
+import urllib
 
 field = []
 def concat():
@@ -39,6 +40,8 @@ def getValue():
                 line4 = i.split("=")
                 prop = line4[0]
                 value = line4[1]
+                if prop == "q":
+                    value = urllib.unquote(value)
                 if ")" in value:
                     value = value.split(")")
                     value = value[0]

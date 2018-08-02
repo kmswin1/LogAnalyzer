@@ -3,6 +3,7 @@ import xmltodict, json
 import os
 import sys
 import urllib2
+import urllib
 from threading import Thread
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -56,6 +57,8 @@ def convertFile(tno):
                 line4 = i.split("=")
                 prop = line4[0]
                 value = line4[1]
+                if prop == "q":
+                    value = urllib.unquote(value)
                 if ")" in value:
                     value = value.split(")")
                     value = value[0]
