@@ -80,8 +80,8 @@ def convertFile(tno):
                 # if True:
                 indexObj = {}
                 indexObj["_source"] = json.loads(json_val)
-                indexObj["_index"] = "test-index"
-                indexObj["_type"] = "test"
+                indexObj["_index"] = "log-index"
+                indexObj["_type"] = "logs"
                 indexObj["_id"] = index
 
                 docList.append(indexObj)
@@ -121,7 +121,7 @@ def delete_index():
     print "delete"
 
     try:
-        ret = ESIndicesClient.delete(index="test-index")
+        ret = ESIndicesClient.delete(index="log-index")
         if ret.get('acknowledged', False):
             #log.debug('success to delete index(%s)', index)
             return True
@@ -141,7 +141,7 @@ def create_index():
     print "create"
     try:
         with open("/Users/gimminsang/work/practice/data/mapping.json",'r') as f:
-            ret = ESIndicesClient.create(index="test-index", ignore = 400, body = f.read())
+            ret = ESIndicesClient.create(index="log-index", ignore = 400, body = f.read())
             f.close()
             # ret = ESIndicesClient.create(index=index)
         if ret.get('acknowledged', False) and ret.get('shards_acknowledged', False):
@@ -155,9 +155,9 @@ def create_index():
 
 def search_index():
     print "search"
-    res = ES.search(index="test-index", body={"query":{"match":{"name":"제주"}}})
+    res = ES.search(index="log-index", body={"query":{"match":{"q":"파인애비뉴"}}})
     for hit in res['hits']['hits']:
-        print (hit["_source"]["name"])
+        print (hit["_source"]["log"])
 
 
 
