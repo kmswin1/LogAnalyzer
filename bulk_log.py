@@ -47,10 +47,18 @@ def convertFile(tno):
                 "referrer_code":"","f1.group":"","coord.user.y":"","coord.user.x":"",
                 "rows":"","client_code":"","coord.focus.x":"","coord.focus.y":"",
                 "coord.user.type":"","start":"","q":"","additional_results":"",
-                "use_tdb":"","option":"","app_ver":"","area_name":""}
+                "use_tdb":"","option":"","app_ver":"","area_name":"","time_slot":""}
         while (True):
             line = fp.readline()
             if not line: break
+            time = line.split("]")
+            time = time[0]
+            time = time.split("[")
+            time = time[1]
+            time = time.split(" ")
+            date = time[0]
+            time = time[1].split(",")
+            dic["time_slot"] = date+" "+time[0]
             line2 = line.split("?")
             line3 = line2[1].split("&")
             for i in line3:

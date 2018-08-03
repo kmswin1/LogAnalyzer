@@ -1,0 +1,12 @@
+{
+    "mappings":{
+        "logs":{
+            "properties":{
+                "time_slot":{
+                    "type":"date",
+                    "format" : "yyyy-MM-dd HH:mm:ss"
+                }
+            }
+        }
+    }
+}
