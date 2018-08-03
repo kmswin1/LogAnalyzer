@@ -70,6 +70,9 @@ def convertFile(tno):
                 if ")" in value:
                     value = value.split(")")
                     value = value[0]
+                if "\n" in value:
+                    value = value.split("\n")
+                    value = value[0]
                 dic[prop] = value
             json_val = json.dumps(dic, ensure_ascii=False)
             index += 1
