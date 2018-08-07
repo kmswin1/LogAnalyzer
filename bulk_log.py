@@ -4,6 +4,7 @@ import os
 import sys
 import urllib2
 import urllib
+import config
 from threading import Thread
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -28,8 +29,8 @@ Hosts = []
 Config = None
 ConfigFName = ''
 
-POI_XML_DATA_DIR = "/Users/gimminsang/work/practice/data/"
-BASE_DIR = '/Users/gimminsang/work/practice/data/static'
+POI_XML_DATA_DIR = config.DATA_DIR
+BASE_DIR = config.BASE_DIR
 
 totalProcCnt = 0
 failDocs = []
@@ -65,7 +66,7 @@ def convertFile(tno):
                 line4 = i.split("=")
                 prop = line4[0]
                 value = line4[1]
-                if prop == "q":
+                if prop == "q" or prop == "area_name":
                     value = urllib.unquote(value)
                 if ")" in value:
                     value = value.split(")")
@@ -91,8 +92,8 @@ def convertFile(tno):
                 # if True:
                 indexObj = {}
                 indexObj["_source"] = json.loads(json_val)
-                indexObj["_index"] = "log-index"
-                indexObj["_type"] = "logs"
+                indexObj["_index"] = config.ES_INDEX
+                indexObj["_type"] = config.ES_DOC_TYPE
                 indexObj["_id"] = index
 
                 docList.append(indexObj)
@@ -132,7 +133,7 @@ def delete_index():
     print "delete"
 
     try:
-        ret = ESIndicesClient.delete(index="log-index")
+        ret = ESIndicesClient.delete(index=config.ES_INDEX)
         if ret.get('acknowledged', False):
             #log.debug('success to delete index(%s)', index)
             return True
@@ -151,8 +152,8 @@ def create_index():
     #log.debug('start to create index(%s)', index)
     print "create"
     try:
-        with open("/Users/gimminsang/work/practice/data/mapping.json",'r') as f:
-            ret = ESIndicesClient.create(index="log-index", ignore = 400, body = f.read())
+        with open(config.MAPPING_DIR, 'r') as f:
+            ret = ESIndicesClient.create(index="log-index", body = f.read())
             f.close()
             # ret = ESIndicesClient.create(index=index)
         if ret.get('acknowledged', False) and ret.get('shards_acknowledged', False):
@@ -166,25 +167,43 @@ def create_index():
 
 def search_index():
     print "search"
-    res = ES.search(index="log-index", body={"query":{"match":{"q":"파인애비뉴"}}})
+    res = ES.search(index=config.ES_INDEX, body={"query":{"match":{"q":"파인애비뉴"}}})
     for hit in res['hits']['hits']:
         print (hit["_source"]["log"])
+#임시로 만들어놓은 기능
 
 
+def cluster_allocation(enable='all'):
+    print 'start cluster allocation(%s)' % enable
+    for host in ESHosts:
+        host = host+":"+str(config.ES_HTTP_PORT)
+        url = 'http://%s/_cluster/settings' % (host)
+        method = 'PUT'
+        data = json.dumps({"persistent":{"cluster.routing.allocation.enable":enable}})
+        content_type = 'application/json'
+        timeout = 600
+        ret = util.http_send_json(url, method, data, content_type, timeout)
+        if ret.get('acknowledged', False):
+            print 'success to cluster allocation(%s)' % enable
+            return True
 
+    print 'failed to cluster allocation(%s)' % enable
+
+    return False
+'''
 def cluster_allocation(enable='all'):
     url = 'http://localhost:9200/_cluster/settings'
     data = json.dumps({"persistent": {"cluster.routing.allocation.enable": enable}})
     timeout = 600
     ret = urllib2.Request(url, data, {'Content-Type': 'application/json'})
-
+'''
 
 
 
 def init():
     global ES, ESIndicesClient, ESHosts, Config, ConfigFName
     
-    ESHosts = ["localhost:9200"]
+    ESHosts = config.ES_HOST_LIST
     
     try:
         ES = Elasticsearch(ESHosts, timeout=20)
