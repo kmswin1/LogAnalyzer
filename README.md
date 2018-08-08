@@ -4,11 +4,11 @@
 데이터 벌크로 es 에 넣기 : python bulk_log.py
 
 
-python run.py : step of data refining |
+python run.py : step of data refining
 
-python bulk_log.py --a CREATE_INDEX : create index |
+python bulk_log.py --a CREATE_INDEX : create index
 
-python bulk_log.py --a DELETE_INDEX : delete index |
+python bulk_log.py --a DELETE_INDEX : delete index
 
 python bulk_log.py --a STATIC_INDEX : bulk in to the elasticsearch
 
